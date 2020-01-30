@@ -4,8 +4,6 @@ package ListsAndIterators;
  * @author Martim Lopes Moura
  */
 
-import Trees.ElementNotFoundException;
-
 import java.util.Iterator;
 
 public interface ListADT<T> extends Iterable<T> {

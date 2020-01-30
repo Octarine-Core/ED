@@ -2,11 +2,21 @@ package Trees;
 
 public class LinkedBinaryNode<T>{
     private T element;
+    private int height;
     private LinkedBinaryNode<T> left;
     private LinkedBinaryNode<T> right;
 
     public LinkedBinaryNode(T element) {
         this.element = element;
+        height = 1;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public T getElement() {

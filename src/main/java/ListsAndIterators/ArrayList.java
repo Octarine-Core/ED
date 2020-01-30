@@ -1,10 +1,8 @@
 package ListsAndIterators;
 
-import Trees.ElementNotFoundException;
-
 import java.util.Iterator;
 
-public class ArrayList<T> implements ListADT<T>{
+public class ArrayList<T> implements ListADT<T>, Iterable<T>{
 
     protected T[] array;
     protected int last;
@@ -57,7 +55,6 @@ public class ArrayList<T> implements ListADT<T>{
         else {
             return null;
         }
-
     }
 
     /**
@@ -89,6 +86,11 @@ public class ArrayList<T> implements ListADT<T>{
      */
     @Override
     public boolean contains(T target) {
+        for(int i = 0; i< last; i++){
+            if(array[i].equals(target)){
+                return true;
+            }
+        };
         return false;
     }
 

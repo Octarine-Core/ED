@@ -35,7 +35,6 @@ public class Searcher<T extends Comparable<? super T>> {
                 }
             }
         }
-        return 0;
     }
 
     void selectionSort(T[] array){
