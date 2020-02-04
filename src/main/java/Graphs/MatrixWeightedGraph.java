@@ -12,7 +12,7 @@ public class MatrixWeightedGraph<T> extends MatrixDiGraph<T> implements NetworkA
 
     @Override
     public double shortestPathWeight(T vertex1, T vertex2) {
-        double[] distanceArray = Utils.dijkstra(matrix,getIndex(vertex1), size(), new int[size()]);
+        double[] distanceArray = dijkstra(getIndex(vertex1), size(), new int[size()]);
         return distanceArray[getIndex(vertex2)];
 
     }

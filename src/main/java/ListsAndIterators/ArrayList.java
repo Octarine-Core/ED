@@ -124,7 +124,14 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
     public Iterator<T> iterator() {
         return new ArrayIterator<>(array, last);
     }
-    
+
+    public Iterator<T> reverseIterator(){
+        T newArray[] = (T[])new Object[size()];
+        for (int i = 0; i < size(); i++) {
+            newArray[size()-i-1] = array[i];
+        }
+        return new ArrayIterator<>(newArray, last);
+    }
     protected void expandCapacity(){
         T[] newArray = (T[])(new Object[array.length*2]);
         for(int i = 0; i<array.length; i++){

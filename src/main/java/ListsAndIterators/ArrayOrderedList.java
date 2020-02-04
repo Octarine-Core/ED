@@ -39,7 +39,6 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
 
         for(int j = last; j>i; j--){
             array[j+1] = array[j];
-            System.err.println(j);
         }
 
         array[i] = element;

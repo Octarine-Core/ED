@@ -1,22 +1,24 @@
 package Graphs;
 
 import LinkedListsStacksAndQueues.LinkedQueue;
+import LinkedListsStacksAndQueues.QueueADT;
 import ListsAndIterators.ArrayIterator;
 import ListsAndIterators.ArraySet;
 import ListsAndIterators.ArrayUnorderedList;
+import ListsAndIterators.UnorderedListADT;
 import Stacks.ArrayStack;
 import Stacks.StackADT;
 import java.util.Iterator;
 
 public class MatrixDiGraph<T>implements GraphADT<T> {
-    double[][] matrix;
+    Double[][] matrix;
     int numOfVertices;
     int numOfEdges;
     protected int SIZE = 50;
     T vertices[];
 
     public MatrixDiGraph() {
-        matrix = new double[SIZE][SIZE];
+        matrix = new Double[SIZE][SIZE];
         vertices = (T[]) new Object[SIZE];
         numOfEdges = 0;
         numOfVertices = 0;
@@ -43,13 +45,13 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
 
     @Override
     public void addEdge(T vertex1, T vertex2) {
-        matrix[getIndex(vertex1)][getIndex(vertex2)]=1;
+        matrix[getIndex(vertex1)][getIndex(vertex2)]=1.0;
         numOfEdges++;
     }
 
     @Override
     public void removeEdge(T vertex1, T vertex2) {
-        matrix[getIndex(vertex1)][getIndex(vertex2)]=0;
+        matrix[getIndex(vertex1)][getIndex(vertex2)]=null;
         numOfEdges--;
     }
 
@@ -64,7 +66,7 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
             T v = queue.dequeue();
             for(int i = 0; i<numOfVertices; i++){
                 for (int j = 0;j < matrix[getIndex(v)].length; j++) {
-                    if(matrix[getIndex(v)][j]!= 0 && !visitedVertices.contains(vertices[j])){
+                    if(matrix[getIndex(v)][j]!= null && !visitedVertices.contains(vertices[j])){
                         queue.enqueue(vertices[j]);
                         visitedVertices.add(vertices[j]);
                     }
@@ -118,7 +120,7 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
     private void expandCapacity(){
         SIZE *= 2;
         T newVertices[] = (T[]) new Object[SIZE];
-        double newEdges[][] = new double[SIZE][SIZE];
+        Double newEdges[][] = new Double[SIZE][SIZE];
         for (int i = 0; i < vertices.length; i++) {
             newVertices[i] = vertices[i];
             for (int j = 0; j < vertices.length; j++) {
@@ -182,7 +184,7 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
                 // Update dist[v] only if is not in sptSet, there is an
                 // edge from u to v, and total weight of path from src to
                 // v through u is smaller than current value of dist[v]
-                if (!sptSet[v] && matrix[u][v] != 0 &&
+                if (!sptSet[v] && matrix[u][v] != null &&
                         dist[u] != Integer.MAX_VALUE &&
                         dist[u] + matrix[u][v] < dist[v]) {
                     parentArray[v] = u;
@@ -220,4 +222,18 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
         }
         return list;
     }
+
+    public UnorderedListADT<T> getNeighbours(T vertex){
+        UnorderedListADT<T> neighbours = new ArrayUnorderedList<>();
+        for (int i = 0; i < size(); i++) {
+            if(matrix[getIndex(vertex)][i] != null){
+                neighbours.addToRear(vertices[i]);
+            }
+        }
+        return neighbours;
+    }
+
+    public static void main(String[] args) {
+    }
+
 }

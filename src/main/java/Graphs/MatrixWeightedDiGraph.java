@@ -16,9 +16,13 @@ public class MatrixWeightedDiGraph<T> extends MatrixDiGraph<T> implements Networ
         }
     }
 
+    public Double getEdge(T vertex1, T vertex2){
+        return matrix[getIndex(vertex1)][getIndex(vertex2)];
+    }
+
     @Override
     public double shortestPathWeight(T vertex1, T vertex2) {
-        double[] distanceArray = Utils.dijkstra(matrix,getIndex(vertex1), size(), new int[size()]);
+        double[] distanceArray = dijkstra(getIndex(vertex1), size(), new int[size()]);
         try{
             return distanceArray[getIndex(vertex2)];
         }catch (IndexOutOfBoundsException e){
@@ -37,15 +41,15 @@ public class MatrixWeightedDiGraph<T> extends MatrixDiGraph<T> implements Networ
         graph.addVertex("Sala");
 
         graph.addEdge("Quarto1", "Quarto2", 2.0);
-        graph.addEdge("Quarto1", "Quarto3", 4.0);
-        graph.addEdge("Quarto2", "Quarto3", 1.0);
+        graph.addEdge("Quarto1", "Quarto3", 1.0);
+        graph.addEdge("Quarto2", "Quarto3", 0.0);
         graph.addEdge("Quarto3", "Sala", 3.0);
         graph.addEdge("Quarto3", "Quarto4", 1.0);
         graph.addEdge("Sala", "Quarto2", 1.0);
         graph.addEdge("Quarto4", "Sala", 1.0);
 
         Iterator<String> spIter= graph.iteratorShortestPath("Quarto1", "jshdjashdhj");
-        System.out.println(graph.shortestPathWeight("Quarto1", "ansda"));
+        System.out.println(graph.shortestPathWeight("Quarto1", "Quarto3"));
         while (spIter.hasNext()){
             System.out.println(spIter.next());
         }
