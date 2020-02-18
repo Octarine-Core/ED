@@ -13,10 +13,18 @@ public class Score implements Comparable<Score>{
 
     @Override
     public int compareTo(Score o) {
-        double difference = this.score - o.score;
-        if (difference == 0)return 0;
-        if (difference > 0) return 1;
-        return -1;
+        if(this.difficulty > o.difficulty){
+            return 1;
+        }
+        else if(this.difficulty < o.difficulty){
+            return -1;
+        }
+        else {
+            double difference = this.score - o.score;
+            if (difference == 0) return 0;
+            if (difference > 0) return 1;
+            return -1;
+        }
     }
 
 }

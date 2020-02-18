@@ -5,11 +5,11 @@ public class ArraySet<T> extends ArrayList<T> {
     public boolean add(T element){
         if (contains(element)) return true;
         else {
-            if(last>=array.length-2){
+            if(size==array.length-1){
                 expandCapacity();
             }
-            array[last] = element;
-            last++;
+            array[size] = element;
+            size++;
             return false;
         }
     }

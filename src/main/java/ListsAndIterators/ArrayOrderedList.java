@@ -10,7 +10,7 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
     public ArrayOrderedList() {
 
         array = (T[])(new Object[100]);
-        last = 0;
+        size = 0;
     }
 
     /**
@@ -26,23 +26,23 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
             throw new UnsupportedDataTypeException();
         }
 
-        if(last+1 >= array.length){
+        if(size+1 >= array.length){
             expandCapacity();
         }
 
         int i;
-        for(i = 0; i<last;i++){
+        for(i = 0; i<size;i++){
             if(((Comparable) element).compareTo(array[i]) < 0){
                 break;
             }
         }
 
-        for(int j = last; j>i; j--){
+        for(int j = size; j>i; j--){
             array[j+1] = array[j];
         }
 
         array[i] = element;
-        last++;
+        size++;
     }
     /**
      * Removes and returns the first element from this list.

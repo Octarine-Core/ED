@@ -13,15 +13,18 @@ import org.json.simple.parser.ParseException;
 import javax.activation.UnsupportedDataTypeException;
 import java.io.*;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.DoubleBinaryOperator;
 
 public class Map extends MatrixWeightedDiGraph<String> {
     private String name;
     Double healthPoints;
     private String mapPath;
+    public String shieldRoom;
+    public double shieldValue;
 
 
-    Map(String path) {
+    Map(String path) throws InvalidMapFormatException {
 
         super();
 
@@ -33,7 +36,7 @@ public class Map extends MatrixWeightedDiGraph<String> {
         try {
             fileReader = new FileReader(mapPath);
         } catch (FileNotFoundException e) {
-            return;
+            throw new InvalidMapFormatException("File not found: "+ e);
         }
 
         JSONObject jsonObject;
@@ -42,10 +45,9 @@ public class Map extends MatrixWeightedDiGraph<String> {
             jsonObject = (JSONObject) parser.parse(fileReader);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
+            throw new InvalidMapFormatException("Could not read File: "+ e);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return;
+            throw new InvalidMapFormatException("JSON was poorly formated: "+ e);
         }
 
         name = (String) jsonObject.get("nome");
@@ -60,22 +62,14 @@ public class Map extends MatrixWeightedDiGraph<String> {
         while (iter.hasNext()){
             JSONObject obj = (JSONObject)iter.next();
             String currentRoom = (String) obj.get("aposento");
-            System.out.println(currentRoom);
             addVertex(currentRoom);
             Room newRoom = new Room(currentRoom, ((Long)obj.get("fantasma")).intValue());
             rooms.addToRear(newRoom);
         }
-        addVertex("exterior");
-        addVertex("entrada");
-        rooms.addToRear(new Room("entrada", 0));
-        rooms.addToRear(new Room("exterior", 0));
-
-        for (Room r :
-                rooms) {
-            System.out.println(r.name + "-  " + r.ghost);
-        }
-        Iterator vertexIter = verticesIterator();
-
+        //addVertex("exterior");
+        //addVertex("entrada");
+        //rooms.addToRear(new Room("entrada", 0));
+        //rooms.addToRear(new Room("exterior", 0));
 
         iter = jsonArray.iterator();
 
@@ -87,7 +81,6 @@ public class Map extends MatrixWeightedDiGraph<String> {
             for (Object o: arr){
                 String connection = (String)o;
                 String departingRoom = (String) obj.get("aposento");
-                System.out.println(departingRoom + "  " + connection);
                 if(rooms.find(connection)==null){
                     rooms.addToRear(new Room(connection, 0));
                     addVertex(connection);
@@ -95,9 +88,62 @@ public class Map extends MatrixWeightedDiGraph<String> {
                 addEdge(departingRoom, connection, rooms.find(connection).ghost);
                 addEdge(connection, departingRoom, rooms.find(departingRoom).ghost);
             }
-        };
+        }
+
+        addShield();
+
     };
 
+    /**
+     * Adds a shield to a room with no ghost in it (except for entrada and exterior)
+     * @throws InvalidMapFormatException if there is no entrada or exterior
+     */
+    private void addShield() throws InvalidMapFormatException {
+        UnorderedListADT<String> ghostlessRooms = new ArrayUnorderedList<>();
+        Iterator<String> roomIter = this.verticesIterator();
+
+        while (roomIter.hasNext()){
+            String current = roomIter.next();
+            if(this.getIncomingEdges(current).contains(0.0)){
+                ghostlessRooms.addToRear(current);
+                System.out.println(current);
+            }
+        }
+
+        if(ghostlessRooms.size() != 2){
+            try {
+                ghostlessRooms.remove("entrada");
+                ghostlessRooms.remove("exterior");
+            } catch (ElementNotFoundException e) {
+                throw new InvalidMapFormatException("NO ENTRANCE OR EXTERIOR");
+            }
+
+            Random rand = new Random();
+            int randInt = rand.nextInt(ghostlessRooms.size()) + 1;
+
+            Iterator<String> ghostlessIter = ghostlessRooms.iterator();
+            int i = 0;
+            while (ghostlessIter.hasNext()){
+                if(i < randInt){
+                    shieldRoom = ghostlessIter.next();
+                    i++;
+                }else {
+                    break;
+                }
+            }
+
+            System.out.println("Shield added to "+ shieldRoom);
+        }
+
+    }
+
+    /**
+     * Saves the score to the same PATH that the map was loaded from
+     *
+     * @param name players name
+     * @param hp remaining hp
+     * @param difficulty selected dificulty
+     */
     public void saveScore(String name, double hp, int difficulty){
         JSONParser parser = new JSONParser();
 
@@ -143,6 +189,10 @@ public class Map extends MatrixWeightedDiGraph<String> {
         }
     }
 
+    /**
+     * Gets the ordered scoredBoard
+     * @return OrderedList of Scores, compared by dificulty first and the by score.
+     */
     public OrderedListADT<Score> getScores(){
 
         JSONParser parser = new JSONParser();
@@ -183,8 +233,6 @@ public class Map extends MatrixWeightedDiGraph<String> {
 
             }
         }
-
-
         return scoresList;
 
     }

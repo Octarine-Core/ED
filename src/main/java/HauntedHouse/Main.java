@@ -123,11 +123,24 @@ public class Main {
             return;
         }
         selectedMap = maps[option-1];
-        map = new Map("./src/main/resources/" + selectedMap);
-        gameModeMenu();
+        try {
+            map = new Map("./src/main/resources/" + selectedMap);
+            gameModeMenu();
+        } catch (InvalidMapFormatException e) {
+            print("Invalid Map format, error is: " + e);
+        }
+
     }
 
     public static void gameModeMenu(){
+        if(map.healthPoints - map.shortestPathWeight("entrada", "exterior") <= 0){
+            print("This map cant be loaded, it doesnt have a path that leaves you alive!");
+            System.out.print("#: ");
+            Scanner scanner = new Scanner(System.in);
+            scanner.next();
+            return;
+        };
+
         boolean done = false;
         do {
             clearScreen();
@@ -210,7 +223,7 @@ public class Main {
         print("\n");
         Double shortestPathWeight = map.shortestPathWeight("entrada", "exterior");
         print("You started with " + map.healthPoints + " HP, took " + shortestPathWeight*difficulty
-        + " points of damage, leaving you with a total final score of " + (map.healthPoints - shortestPathWeight));
+        + " points of damage, leaving you with a total final score of " + (map.healthPoints - shortestPathWeight*difficulty));
         Scanner scanner = new Scanner(System.in);
         System.out.print("#: ");
         scanner.next();

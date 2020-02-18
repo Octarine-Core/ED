@@ -8,6 +8,8 @@ import ListsAndIterators.ArrayUnorderedList;
 import ListsAndIterators.UnorderedListADT;
 import Stacks.ArrayStack;
 import Stacks.StackADT;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.util.Iterator;
 
 public class MatrixDiGraph<T>implements GraphADT<T> {
@@ -26,6 +28,9 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
 
     @Override
     public void addVertex(T vertex) {
+        if(size() == SIZE){
+            expandCapacity();
+        }
         vertices[numOfVertices] = vertex;
         numOfVertices++;
     }
@@ -79,7 +84,7 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
 
     @Override
     public Iterator iteratorDFS(T startVertex) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
@@ -118,12 +123,12 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
         return -1;
     }
     private void expandCapacity(){
-        SIZE *= 2;
+        SIZE += 50;
         T newVertices[] = (T[]) new Object[SIZE];
         Double newEdges[][] = new Double[SIZE][SIZE];
-        for (int i = 0; i < vertices.length; i++) {
+        for (int i = 0; i < size(); i++) {
             newVertices[i] = vertices[i];
-            for (int j = 0; j < vertices.length; j++) {
+            for (int j = 0; j < size(); j++) {
                 newEdges[i][j] = matrix[i][j];
             }
         }
@@ -212,6 +217,7 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
         int vertex = j;
         StackADT<Integer> stack = new ArrayStack<>();
         ArrayUnorderedList<T> list= new ArrayUnorderedList<>();
+        //puts the minspantree that exists in parent in the stack in reverse order
         while (vertex!=-1){
             stack.push(vertex);
             vertex=parent[vertex];
@@ -233,7 +239,23 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
         return neighbours;
     }
 
+    public UnorderedListADT<Double> getIncomingEdges(T vertex){
+        int vertIndx = getIndex(vertex);
+        UnorderedListADT<Double> edgeList = new ArrayUnorderedList<>();
+        for (int i = 0; i < size(); i++) {
+            if(matrix[i][vertIndx] != null){
+                edgeList.addToRear(matrix[i][vertIndx]);
+            }
+        }
+        return edgeList;
+    }
+
     public static void main(String[] args) {
+        MatrixDiGraph<String> graph = new MatrixDiGraph<>();
+        for (int i = 0; i < 55; i++) {
+            graph.addVertex("ihh");
+        }
+        System.out.println(graph.SIZE);
     }
 
 }

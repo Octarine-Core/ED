@@ -5,16 +5,16 @@ import java.util.Iterator;
 public class ArrayList<T> implements ListADT<T>, Iterable<T>{
 
     protected T[] array;
-    protected int last;
+    protected int size;
 
 
     @Override
     public T removeFirst() {
         T removed = array[0];
-        for(int i = 1; i<last;i++){
+        for(int i = 1; i<size;i++){
             array[i-1]=array[i];
         }
-        last--;
+        size--;
         return removed;
     }
 
@@ -25,8 +25,8 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
      */
     @Override
     public T removeLast() {
-        T newLast = array[last-1];
-        last--;
+        T newLast = array[size-1];
+        size--;
         return newLast;
     }
 
@@ -49,7 +49,10 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
         }
         rElem = array[i];
         if(found){
-            last--;
+            for(int j = i+1; i<size; i++){
+                array[j-1] = array[j];
+            }
+            size--;
             return rElem;
         }
         else {
@@ -74,7 +77,8 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
      */
     @Override
     public T last() {
-        return array[last-1];
+        if(size==0)return null;
+        return array[size-1];
     }
 
     /**
@@ -86,7 +90,7 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
      */
     @Override
     public boolean contains(T target) {
-        for(int i = 0; i< last; i++){
+        for(int i = 0; i< size; i++){
             if(array[i].equals(target)){
                 return true;
             }
@@ -101,7 +105,7 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
      */
     @Override
     public boolean isEmpty() {
-        return (last == 0);
+        return (size == 0);
     }
 
     /**
@@ -112,7 +116,7 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
      */
     @Override
     public int size() {
-        return last;
+        return size;
     }
 
     /**
@@ -122,7 +126,7 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
      */
     @Override
     public Iterator<T> iterator() {
-        return new ArrayIterator<>(array, last);
+        return new ArrayIterator<>(array, size);
     }
 
     public Iterator<T> reverseIterator(){
@@ -130,10 +134,10 @@ public class ArrayList<T> implements ListADT<T>, Iterable<T>{
         for (int i = 0; i < size(); i++) {
             newArray[size()-i-1] = array[i];
         }
-        return new ArrayIterator<>(newArray, last);
+        return new ArrayIterator<>(newArray, size);
     }
     protected void expandCapacity(){
-        T[] newArray = (T[])(new Object[array.length*2]);
+        T[] newArray = (T[])(new Object[array.length + 50]);
         for(int i = 0; i<array.length; i++){
             newArray[i] = array[i];
         }

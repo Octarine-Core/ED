@@ -3,28 +3,28 @@ package ListsAndIterators;
 public class ArrayUnorderedList<T> extends ArrayList<T> implements UnorderedListADT<T> {
     public ArrayUnorderedList() {
         array = (T[])new Object[100];
-        last = 0;
+        size = 0;
     }
 
     @Override
     public void addToFront(T element) {
-        if(array.length >= last-2){
+        if(array.length-1 == size){
             expandCapacity();
         }
-        for(int i = last; i>0;i--){
+        for(int i = size; i>0;i--){
             array[i]=array[i-1];
         }
         array[0]=element;
-        last++;
+        size++;
     }
 
     @Override
     public void addToRear(T element) {
-        if(array.length >= last-2){
+        if(array.length-1 == size){
             expandCapacity();
         }
-        array[last] = element;
-        last++;
+        array[size] = element;
+        size++;
     }
 
     @Override
@@ -41,4 +41,5 @@ public class ArrayUnorderedList<T> extends ArrayList<T> implements UnorderedList
         }
         return null;
     }
+
 }
