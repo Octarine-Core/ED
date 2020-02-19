@@ -26,7 +26,7 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
             throw new UnsupportedDataTypeException();
         }
 
-        if(size+1 >= array.length){
+        if(size >= array.length){
             expandCapacity();
         }
 
@@ -38,7 +38,7 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
         }
 
         for(int j = size; j>i; j--){
-            array[j+1] = array[j];
+            array[j] = array[j-1];
         }
 
         array[i] = element;
@@ -56,11 +56,12 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
         try {
             A.add(1);
             A.add(2);
+            A.add(3);
+            A.add(3);
+            A.add(3);
+            A.add(3);
+            A.add(1);
             A.add(2);
-            A.add(3);
-            A.add(3);
-            A.add(3);
-            A.add(3);
 
         }catch (Exception e){
             e.printStackTrace();

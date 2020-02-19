@@ -1,6 +1,7 @@
 package HauntedHouse;
 import ListsAndIterators.ArrayOrderedList;
 import ListsAndIterators.ArrayUnorderedList;
+import ListsAndIterators.OrderedListADT;
 import ListsAndIterators.UnorderedListADT;
 
 import java.awt.*;
@@ -127,19 +128,12 @@ public class Main {
             map = new Map("./src/main/resources/" + selectedMap);
             gameModeMenu();
         } catch (InvalidMapFormatException e) {
-            print("Invalid Map format, error is: " + e);
+            print("Invalid Map format, error is: " + e.toString());
         }
 
     }
 
     public static void gameModeMenu(){
-        if(map.healthPoints - map.shortestPathWeight("entrada", "exterior") <= 0){
-            print("This map cant be loaded, it doesnt have a path that leaves you alive!");
-            System.out.print("#: ");
-            Scanner scanner = new Scanner(System.in);
-            scanner.next();
-            return;
-        };
 
         boolean done = false;
         do {
@@ -147,7 +141,7 @@ public class Main {
             print("Loaded map is " + selectedMap + "" + "\n\n" +
                     "Select the game mode: \n\n" +
                     "[A]utomatic: The game will play itself for you\n" +
-                    "[M]anual: You will play manually, and can see the entire map\n" +
+                    "[M]anual: You will play manually\n" +
                     "[H]all of fame (scoreboard)\n" +
                     "[E]xit");
             Scanner scanner = new Scanner(System.in);
@@ -210,20 +204,62 @@ public class Main {
     }
 
     public static void autoPlay(int difficulty){
+        if(map.healthPoints - map.shortestPathWeight("entrada", "exterior") * difficulty <= 0){
+            print("This map cant be loaded, it doesnt have a path that leaves you alive!");
+            System.out.print("#: ");
+            Scanner scanner = new Scanner(System.in);
+            scanner.next();
+            return;
+        };
+
         clearScreen();
         print("The shortest path to the exit is:" +
                 "\n");
         Iterator iter = map.iteratorShortestPath("entrada", "exterior");
+        String outPut = "";
+        boolean gotShield = false;
+        double dmgTaken = 0;
         while (iter.hasNext()){
-            System.out.print(iter.next());
-            if(iter.hasNext()){
-                System.out.print(" -->  ");
+            String room = (String)iter.next();
+            outPut +=  "| " + room;
+
+            if(room.equals(map.shieldRoom)){
+                map.shieldRoom = null;
+                outPut += " (found shield: " + map.initialShieldHp + " durability.)";
+                gotShield = true;
             }
+
+            Double ghostDamage = map.getIncomingEdges(room).first()*difficulty;
+            if(ghostDamage != 0.0){
+                outPut += " (ghost dealt " + ghostDamage + " damage. ";
+                double realDamage = ghostDamage;
+                if(gotShield){
+                    if(map.shieldHp<=ghostDamage){
+                        gotShield = false;
+                        outPut += " Shield broke. ";
+                        realDamage = ghostDamage - map.shieldHp;
+                        map.shieldHp = 0;
+                    }else {
+                        outPut += "Shield took " + ghostDamage + "dmg, ";
+                        map.shieldHp-=ghostDamage;
+                        realDamage = 0;
+                    }
+                    outPut += "You took " + realDamage;
+                }
+                dmgTaken += realDamage;
+                outPut += ")";
+            }
+            outPut += " |";
+
+            if(iter.hasNext()){
+                outPut +=("   -->   ");
+            }
+
         }
-        print("\n");
-        Double shortestPathWeight = map.shortestPathWeight("entrada", "exterior");
-        print("You started with " + map.healthPoints + " HP, took " + shortestPathWeight*difficulty
-        + " points of damage, leaving you with a total final score of " + (map.healthPoints - shortestPathWeight*difficulty));
+        print(outPut);
+
+        print("You started with " + map.healthPoints + " HP, took " + dmgTaken
+        + " points of damage, leaving you with a total final score of " + (map.healthPoints - dmgTaken));
         Scanner scanner = new Scanner(System.in);
         System.out.print("#: ");
         scanner.next();
@@ -251,6 +287,7 @@ public class Main {
 
         String position = "entrada";
         Double hp = map.healthPoints;
+        boolean hasShield = false;
         boolean done = false;
         do {
             if(hp<=0.0){
@@ -309,11 +346,16 @@ public class Main {
                 break;
             }
             print("Your hp is " + hp);
+            if(hasShield)print("You have a shield with "+ map.shieldHp + "durability points.");
             print("You are in " + position + " there are connections to: \n");
             UnorderedListADT<String> neighbours = map.getNeighbours(position);
+            String neighbourArr[] = new String[neighbours.size()];
+            int k = 0;
             for (String neighbour :
                     neighbours) {
-                print(neighbour);
+                neighbourArr[k] = neighbour;
+                print((k+1) +".   " + neighbourArr[k]);
+                k++;
             }
 
             Scanner scanner = new Scanner(System.in);
@@ -341,50 +383,134 @@ public class Main {
                         break;
                 }
 
-                if(!inputIsValid && neighbours.contains(option)){
-                    clearScreen();
-                    print("You moved from " + position + " to " + option);
-                    Double ghost = map.getEdge(position, option);
-                    if(ghost != 0.0){
-                        print(" .-.\n" +
-                                "(o o) boo!\n" +
-                                "| O \\\n" +
-                                " \\   \\\n" +
-                                "  `~~~'");
-                        print("You took " + (ghost*difficulty) + " points of damage");
-                    };
+                Integer parsedOption = parseNumeric(option);
 
-                    hp -= (ghost*difficulty);
-                    inputIsValid = true;
-                    position = option;
+                if(parsedOption != null){
+                    if(parsedOption-1 >= 0 && parsedOption-1 < neighbourArr.length){
+                        clearScreen();
+                        print("You moved from " + position + " to " + neighbourArr[parsedOption-1]);
+                        Double ghost = map.getEdge(position, neighbourArr[parsedOption-1]);
+                        if(ghost != 0.0){
+                            print(" .-.\n" +
+                                    "(o o) boo!\n" +
+                                    "| O \\\n" +
+                                    " \\   \\\n" +
+                                    "  `~~~'");
+                            print("The Ghost dealt " + (ghost*difficulty) + " points of damage");
+                            double realDamage;
+                            if(hasShield){
+                                realDamage = applyShieldDamage(ghost*difficulty);
+                                if(realDamage > 0)hasShield=false;
+                                print("You took "+ realDamage + "damage.");
+                            }
+                            else {
+                                print("You took all of its damage");
+                                realDamage = ghost*difficulty;
+                            }
+                            hp -= (realDamage);
+                        }
+                        if(neighbourArr[parsedOption-1].equals(map.shieldRoom)){
+                            map.shieldRoom=null;
+                            hasShield=true;
+                            print("\\_________________/\n" +
+                                    "|       | |       |\n" +
+                                    "|       | |       |\n" +
+                                    "|       | |       |\n" +
+                                    "|_______| |_______|\n" +
+                                    "|_______   _______|\n" +
+                                    "|       | |       |\n" +
+                                    "|       | |       |\n" +
+                                    " \\      | |      /\n" +
+                                    "  \\     | |     /\n" +
+                                    "   \\    | |    /\n" +
+                                    "    \\   | |   /\n" +
+                                    "     \\  | |  /\n" +
+                                    "      \\ | | /\n" +
+                                    "       \\| |/\n" +
+                                    "        \\_/");
+                        }
+                        inputIsValid = true;
+                        position = neighbourArr[parsedOption-1];
+
+                    }
                 }
-
-
             } while (!inputIsValid);
-
-
         }while (!done);
+    }
+
+    private static Integer parseNumeric(String numStr){
+        if (numStr == null) {
+            return null;
+        }
+        Integer num;
+        try {
+            num = Integer.parseInt(numStr);
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+        return num;
     }
 
     private static void listScores(){
         clearScreen();
         Scanner scanner = new Scanner(System.in);
         print("HALL OF FAME:  ");
-        if(map.getScores() == null){
-            print("No scores yet!");
-        }else {
-            Iterator<Score> reverserIter = ((ArrayOrderedList)map.getScores()).reverseIterator();
 
-            while (reverserIter.hasNext()){
-                Score score = reverserIter.next();
-                if(score != null){
-                    print("Name: " + score.name + " Difficulty: " + score.difficulty + " Score: "+ score.score);
+        ArrayOrderedList<Score> scores;
+        try {
+            scores = map.getScores();
+            if(scores == null){
+                print("No scores yet!");
+            }else {
+                Iterator<Score> reverserIter = scores.reverseIterator();
+                while (reverserIter.hasNext()){
+                    Score score = reverserIter.next();
+                    if(score != null){
+                        print("Name: " + score.name + " Difficulty: " + score.difficulty + " Score: "+ score.score);
+                    }
                 }
             }
+        } catch (InvalidMapFormatException e) {
+            print("THERE WAS AN EXCEPTION: "+ e.toString());
         }
 
         System.out.print("#: ");
         scanner.next();
+    }
+
+    private static double applyShieldDamage(double incomingDamage){
+        double damageTaken = 0;
+        if(incomingDamage>=map.shieldHp){
+            damageTaken = incomingDamage-map.shieldHp;
+            map.shieldHp = 0;
+            print("" +
+                    "...................:=@@@@   @@@@@@@@@@#*:..................\n" +
+                    "..................=@@@@@@@  @@@@@@@@@@@@@+.................\n" +
+                    "................*@@@@@@@@@  @@@@@@@@@@@@@@@:...............\n" +
+                    "...........-@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@#...........\n" +
+                    "...........-@@@@@@@@@@@@@@@   #@@@@@@@@@@@@@@@@#...........\n" +
+                    "...........-@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@#...........\n" +
+                    "...........-@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@#...........\n" +
+                    "............#@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@*...........\n" +
+                    "............=@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@+...........\n" +
+                    "............:@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@-...........\n" +
+                    ".............@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@=............\n" +
+                    ".............+@@@@@@@@@@@@@@@@@   @@@@@@@@@@@@:............\n" +
+                    "..............#@@@@@@@@@@@@@@@@@  @@@@@@@@@@@=.............\n" +
+                    "..............:@@@@@@@@@@@@@@@@  @@@@@@@@@@@@..............\n" +
+                    "...............+@@@@@@@@@@@@@@  @@@@@@@@@@@@-..............\n" +
+                    "................:@@@@@@@@@@@@  @@@@@@@@@@@@-...............\n" +
+                    ".................-@@@@@@@@@@@@@  =@@@@@@@#.................\n" +
+                    "...................+@@@@@@@@@@@@@  +@@@@:..................\n" +
+                    ".....................+@@@@@@@@@@@@@@+-:....................\n" +
+                    "........................+@@@@@@@@@#:.......................\n" +
+                    "                   YOUR SHIELD BROKE :C");
+        }
+        else {
+            print("Shield Blocked " + incomingDamage + " damage.");
+            map.shieldHp-=incomingDamage;
+        }
+        return damageTaken;
     }
 
     private static void scoreScreen(double score, int difficulty){

@@ -5,6 +5,7 @@ import Graphs.MatrixWeightedDiGraph;
 import Graphs.MatrixWeightedGraph;
 import Graphs.NetworkADT;
 import ListsAndIterators.*;
+import com.sun.org.apache.xml.internal.security.Init;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -21,7 +22,9 @@ public class Map extends MatrixWeightedDiGraph<String> {
     Double healthPoints;
     private String mapPath;
     public String shieldRoom;
-    public double shieldValue;
+    public double initialShieldHp;
+    public double shieldHp;
+    private double biggestGhost = 0;
 
 
     Map(String path) throws InvalidMapFormatException {
@@ -64,6 +67,7 @@ public class Map extends MatrixWeightedDiGraph<String> {
             String currentRoom = (String) obj.get("aposento");
             addVertex(currentRoom);
             Room newRoom = new Room(currentRoom, ((Long)obj.get("fantasma")).intValue());
+            if(newRoom.ghost > biggestGhost) biggestGhost = newRoom.ghost;
             rooms.addToRear(newRoom);
         }
         //addVertex("exterior");
@@ -133,8 +137,9 @@ public class Map extends MatrixWeightedDiGraph<String> {
             }
 
             System.out.println("Shield added to "+ shieldRoom);
+            initialShieldHp = rand.nextInt(((int)biggestGhost )) + 1;
+            shieldHp = initialShieldHp;
         }
-
     }
 
     /**
@@ -193,31 +198,19 @@ public class Map extends MatrixWeightedDiGraph<String> {
      * Gets the ordered scoredBoard
      * @return OrderedList of Scores, compared by dificulty first and the by score.
      */
-    public OrderedListADT<Score> getScores(){
+    public ArrayOrderedList<Score> getScores() throws InvalidMapFormatException {
 
         JSONParser parser = new JSONParser();
 
         FileReader fileReader;
+        JSONObject jsonObject;
         try {
             fileReader = new FileReader(mapPath);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
-
-        JSONObject jsonObject;
-        //Throws error if it goes wrong
-        try {
             jsonObject = (JSONObject) parser.parse(fileReader);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+        } catch ( IOException | ParseException e) {
+            throw new InvalidMapFormatException("COUDLNT PARSE FILE: " + e.toString());
         }
-
-        OrderedListADT<Score> scoresList = new ArrayOrderedList<>();
-
+        ArrayOrderedList<Score> scoresList = new ArrayOrderedList<>();
         JSONArray scores = ((JSONArray)jsonObject.get("scores"));
         if(scores == null){
             return null;
@@ -230,11 +223,11 @@ public class Map extends MatrixWeightedDiGraph<String> {
                 Score score = (new Score((String) obj.get("name"), (double) obj.get("score"), ((Long)obj.get("difficulty")).intValue()));
                 scoresList.add(score);
             }catch (NullPointerException | UnsupportedDataTypeException e){
-
+                throw new InvalidMapFormatException("COULDNT READ SCORE FROM FILE: " + e.toString());
             }
         }
+        if(scoresList.isEmpty())return null;
         return scoresList;
-
     }
 }
 
