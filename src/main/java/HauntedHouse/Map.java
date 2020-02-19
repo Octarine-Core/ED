@@ -16,6 +16,9 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.DoubleBinaryOperator;
 
+/**
+ * Represents a map.
+ */
 public class Map extends MatrixWeightedDiGraph<String> {
     private String name;
     Double healthPoints;
@@ -23,7 +26,11 @@ public class Map extends MatrixWeightedDiGraph<String> {
     public String shieldRoom;
     public double shieldValue;
 
-
+    /**
+     * Constructor for an implicit Map object.
+     * @param path to where the map data is stored.
+     * @throws InvalidMapFormatException if data from map is incorrectly formatted.
+     */
     Map(String path) throws InvalidMapFormatException {
 
         super();
@@ -47,7 +54,7 @@ public class Map extends MatrixWeightedDiGraph<String> {
             e.printStackTrace();
             throw new InvalidMapFormatException("Could not read File: "+ e);
         } catch (ParseException e) {
-            throw new InvalidMapFormatException("JSON was poorly formated: "+ e);
+            throw new InvalidMapFormatException("JSON was poorly formatted: "+ e);
         }
 
         name = (String) jsonObject.get("nome");
@@ -142,7 +149,7 @@ public class Map extends MatrixWeightedDiGraph<String> {
      *
      * @param name players name
      * @param hp remaining hp
-     * @param difficulty selected dificulty
+     * @param difficulty selected difficulty
      */
     public void saveScore(String name, double hp, int difficulty){
         JSONParser parser = new JSONParser();
@@ -191,7 +198,7 @@ public class Map extends MatrixWeightedDiGraph<String> {
 
     /**
      * Gets the ordered scoredBoard
-     * @return OrderedList of Scores, compared by dificulty first and the by score.
+     * @return OrderedList of Scores, compared by dificulty first and then by score.
      */
     public OrderedListADT<Score> getScores(){
 
