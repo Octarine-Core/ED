@@ -1,0 +1,15 @@
+{"scores":[
+    {"difficulty":2,"score":40.0,"name":"Martim"},
+    {"difficulty":1,"score":70.0,"name":"dad"}
+  ],
+  "mapa":[
+    {"ligacoes":["entrada","cozinha","escritorio"],"aposento":"hall","fantasma":0},
+    {"ligacoes":["hall","sala de jantar"],"aposento":"cozinha","fantasma":15},
+    {"ligacoes":["hall","wc","quarto"],"aposento":"escritorio","fantasma":0},
+    {"ligacoes":["escritorio"],"aposento":"wc","fantasma":0},
+    {"ligacoes":["cozinha","sala de estar"],"aposento":"sala de jantar","fantasma":0},
+    {"ligacoes":["exterior","sala de jantar","corredor"],"aposento":"sala de estar","fantasma":15},
+    {"ligacoes":["exterior","sala de estar","quarto"],"aposento":"corredor","fantasma":0},
+    {"ligacoes":["exterior","escritorio","corredor"],"aposento":"quarto","fantasma":20}
+  ],
+  "pontos":100,"nome":"sexta-feira 13"}

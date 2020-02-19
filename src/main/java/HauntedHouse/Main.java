@@ -23,6 +23,10 @@ public class Main {
         mainMenu();
     }
 
+    /**
+     * Shows in the console all menu options available to the user such as
+     * the capability of loading a map, getting info about the game or exit the same.
+     */
     static void mainMenu(){
         char option;
         Scanner scanner = new Scanner(System.in);
@@ -69,6 +73,9 @@ public class Main {
         }while (input!='e');
     }
 
+    /**
+     * Shows some data about the game.
+     */
     static void aboutGame(){
         print("about game");
         Scanner scanner = new Scanner(System.in);
@@ -78,6 +85,9 @@ public class Main {
 
     }
 
+    /**
+     * Clears console by placing new-lines.
+     */
     public static void clearScreen() {
         //doesnt work for some reason
         /*
@@ -99,6 +109,10 @@ public class Main {
 
     }
 
+    /**
+     * Shows all maps that are available to play or none
+     * if the folder is empty.
+     */
     public static void mapSelectionMenu(){
         clearScreen();
         String[] maps = listFilesInFolder(new File("./src/main/resources/"));
@@ -133,6 +147,10 @@ public class Main {
 
     }
 
+    /**
+     * Shows all the mode options available to the user such as auto-play and manual.
+     * Also able to show the scoreboard.
+     */
     public static void gameModeMenu(){
 
         boolean done = false;
@@ -171,6 +189,10 @@ public class Main {
         }while (!done);
     }
 
+    /**
+     * Shows all the difficulty types available to the user.
+     * @param auto true if auto-play is choosen; false otherwise.
+     */
     public static void difficultySelection(boolean auto){
 
         print("Select difficulty level: ");
@@ -203,6 +225,11 @@ public class Main {
 
     }
 
+    /**
+     * Shows the shortest path to exit, initial health,
+     * damage received and final score for an auto-play game mode.
+     * @param difficulty the difficulty choosen by the user.
+     */
     public static void autoPlay(int difficulty){
         if(map.healthPoints - map.shortestPathWeight("entrada", "exterior") * difficulty <= 0){
             print("This map cant be loaded, it doesnt have a path that leaves you alive!");
@@ -266,6 +293,11 @@ public class Main {
 
     }
 
+    /**
+     * Obtains all map files on specified folder.
+     * @param folder where the maps are located.
+     * @return all files found on the specified folder.
+     */
     public static String[] listFilesInFolder(final File folder) {
         File filesArr[] = folder.listFiles();
         String fileNames[] = new String[filesArr.length];
@@ -283,6 +315,11 @@ public class Main {
         return newFileNames;
         }
 
+    /**
+     * Initializes a new manual game mode where the player makes all the
+     * moves he desires.
+     * @param difficulty of the game choosen by the player.
+     */
     public static void gameLoop(int difficulty){
 
         String position = "entrada";
@@ -451,6 +488,10 @@ public class Main {
         return num;
     }
 
+    /**
+     * Shows all scores from all users that completed the selected
+     * map ordered from highest to lowest.
+     */
     private static void listScores(){
         clearScreen();
         Scanner scanner = new Scanner(System.in);
@@ -513,6 +554,12 @@ public class Main {
         return damageTaken;
     }
 
+    /**
+     * Saves the score, difficulty and name of the player after a manual
+     * game ends.
+     * @param score of the player.
+     * @param difficulty of the level choosen by the player.
+     */
     private static void scoreScreen(double score, int difficulty){
         Scanner scanner = new Scanner(System.in);
         print("Please write your name.");
