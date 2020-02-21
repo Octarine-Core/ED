@@ -141,9 +141,8 @@ public class MatrixDiGraph<T>implements GraphADT<T> {
     }
 
     public boolean vertexExists(T vertex){
-        for (T v:
-                vertices) {
-            if (v.equals(vertex)){
+        for (int i = 0; i<size(); i++) {
+            if (vertices[i].equals(vertex)){
                 return true;
             }
         };
