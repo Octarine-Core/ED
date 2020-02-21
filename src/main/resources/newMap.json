@@ -1,1 +1,1 @@
-{"mapa":[{"ligacoes":["entrada","b"],"aposento":"a","fantasma":2},{"ligacoes":["c"],"aposento":"b","fantasma":3},{"ligacoes":["exterior"],"aposento":"c","fantasma":4}],"pontos":30,"nome":"sexta-feira 13"}
+{"scores":[{"difficulty":3,"score":3.0,"name":"martim"}],"mapa":[{"ligacoes":["entrada","b"],"aposento":"a","fantasma":2},{"ligacoes":["c"],"aposento":"b","fantasma":3},{"ligacoes":["exterior"],"aposento":"c","fantasma":4}],"pontos":30,"nome":"sexta-feira 13"}

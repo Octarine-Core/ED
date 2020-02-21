@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -131,7 +132,12 @@ public class Main {
         do{
             System.out.print("#: ");
             Scanner scanner = new Scanner(System.in);
-            option = scanner.nextInt();
+            try{
+                option = scanner.nextInt();
+            }catch (InputMismatchException e){
+                print("Wrong input.");
+                option=-1;
+            }
         }while (option<0 || option > maps.length);
         if(option==0){
             mainMenu();
@@ -326,6 +332,10 @@ public class Main {
         Double hp = map.healthPoints;
         boolean hasShield = false;
         boolean done = false;
+        if(map.healthPoints <= map.shortestPathWeight("entrada", "exterior") * difficulty || map.shortestPathWeight( "entrada", "exterior") == -1){
+            print("This map cant be loaded. It doesnt have a path that leaves you alive!");
+            return;
+        }
         do {
             if(hp<=0.0){
                 clearScreen();

@@ -5,7 +5,7 @@ import Graphs.MatrixWeightedDiGraph;
 import Graphs.MatrixWeightedGraph;
 import Graphs.NetworkADT;
 import ListsAndIterators.*;
-import com.sun.org.apache.xml.internal.security.Init;
+//import com.sun.org.apache.xml.internal.security.Init;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -99,6 +99,9 @@ public class Map extends MatrixWeightedDiGraph<String> {
                 addEdge(departingRoom, connection, rooms.find(connection).ghost);
                 addEdge(connection, departingRoom, rooms.find(departingRoom).ghost);
             }
+        }
+        if(!this.vertexExists("entrada") || !this.vertexExists("exterior")){
+            throw new InvalidMapFormatException("Entrance or Exit doesnt exist");
         }
 
         addShield();

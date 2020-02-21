@@ -53,7 +53,7 @@ System.out.println("AA".compareTo("AAAAAA"));
 
       Dadas  N strings, criar N Queues cada    uma    contendo    uma    das    strings.
   De seguida criar uma Queue das N Queues.
-  Repetidamente     aplicar     uma     operação de junção ordenada às primeiras duas Queues e  re-­‐inserir
+  Repetidamente     aplicar     uma     operacao de junção ordenada às primeiras duas Queues e  re-­‐inserir
   a    nova    Queue no    final.    Repetir    até    que    a    Queue contenha    apenas    uma Queue.
      */
 /*
